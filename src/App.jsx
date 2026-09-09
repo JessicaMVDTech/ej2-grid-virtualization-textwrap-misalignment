@@ -35,12 +35,13 @@ function multiValueTemplate(field, max = 4) {
   };
 }
 
+// Fully made-up placeholder names — not tied to any real company.
 const NAME_POOL = [
-  '20 LEGUAS SA', '21SUR SRL', 'A Y B TRANSPORTES S.R.L.', 'ABB SA',
-  'KEMIRA URUGUAY SA', 'ANDRITZ URUGUAY SA', 'MARA TRANSPORTES SRL',
-  'FORESTAL ORIENTAL SA', 'MONTES DEL PLATA', 'UPM FORESTAL ORIENTAL',
-  'STORA ENSO URUGUAY', 'BTG PACTUAL', 'GRUPO LOGISTICO SRL',
-  'TRANSCARGO SA', 'RUTA NORTE LTDA',
+  'Comercial Aurora SA', 'Distribuidora Boreal SRL', 'Constructora Cedro SA',
+  'Logistica Delta Ltda', 'Transportes Elipse SRL', 'Servicios Fenix SA',
+  'Agroindustrial Girasol SA', 'Metalurgica Halcon SRL', 'Ingenieria Ibis SA',
+  'Papelera Jazmin SA', 'Quimica Kairos SRL', 'Forestal Lirio SA',
+  'Minera Meridian SA', 'Naviera Norte SRL', 'Energetica Orion SA',
 ];
 
 function randomFrom(pool) {
@@ -54,8 +55,8 @@ function randomList(pool, min, max) {
 
 const SUBCONTRATO_OPTIONS = ['No', 'Especifico', 'Multiple'];
 
-// 1089 rows to match the real screen's "Total de registros: 1089".
-function buildData(count = 1089) {
+// Large row count so virtualization has real scroll batches to churn through.
+function buildData(count = 1200) {
   return Array.from({ length: count }, (_, i) => {
     const id = 100 + i;
     const subContractorCompany = randomFrom(SUBCONTRATO_OPTIONS);

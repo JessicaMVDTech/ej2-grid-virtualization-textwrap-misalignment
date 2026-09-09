@@ -31,7 +31,7 @@ columns which are all fixed at `width="150"`.
 
 ## Steps to reproduce
 
-1. Open the grid (1089 rows, matches production data volume).
+1. Open the grid (1200 generated rows, similar order of magnitude to our production dataset).
 2. Scroll down and back up a few times using the mouse wheel / scrollbar.
 3. Resize the "Razon social" column, or sort by "Id".
 4. Observe rows near the viewport edges right after a virtual-scroll
