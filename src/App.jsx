@@ -49,6 +49,9 @@ const NAME_POOL = [
   'Minera Meridian SA', 'Naviera Norte SRL', 'Energetica Orion SA',
 ];
 
+const USER_POOL = ['usuario1', 'usuario2', 'usuario3', 'admin1', 'admin2'];
+const FREQUENCY_OPTIONS = ['Mensual', 'Trimestral', 'Semestral', 'Anual'];
+
 function randomFrom(pool) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
@@ -56,6 +59,12 @@ function randomFrom(pool) {
 function randomList(pool, min, max) {
   const count = Math.floor(Math.random() * (max - min + 1)) + min;
   return Array.from({ length: count }, () => randomFrom(pool));
+}
+
+function randomDate(startYear = 2022) {
+  const start = new Date(startYear, 0, 1).getTime();
+  const end = Date.now();
+  return new Date(start + Math.random() * (end - start));
 }
 
 const SUBCONTRATO_OPTIONS = ['No', 'Especifico', 'Multiple'];
@@ -78,6 +87,19 @@ function buildData(count = 1200) {
       vendorId: subContractorCompany === 'No' ? '0' : String(200000000 + id),
       taxCode: String(110000000000 + id * 37),
       mainCompanies: randomList(NAME_POOL, 0, 5),
+      // Mirrors the real "Companies" column block: ModifiedUser (visible)
+      // -> CreatedUser (visible:false) -> ModifiedDate (visible)
+      // -> CreatedDate (visible:false) -> FieldAudit (visible)
+      // -> AuditComplianceRH (visible). The two hidden columns sit
+      // between visible ones, which is the exact neighborhood where the
+      // report shows a hidden column's value leaking into a visible
+      // column's cell under virtualization.
+      modifiedUser: `sistema\\${randomFrom(USER_POOL)}`,
+      createdUser: `sistema\\${randomFrom(USER_POOL)}`, // hidden column
+      modifiedDate: randomDate(2024),
+      createdDate: randomDate(2022), // hidden column
+      fieldAudit: randomFrom(FREQUENCY_OPTIONS),
+      auditComplianceRH: randomFrom(FREQUENCY_OPTIONS),
     };
   });
 }
@@ -173,19 +195,22 @@ export default function App() {
 
   return (
     <div className="app">
-      <h2>EJ2 React Grid — rows appear shifted / misaligned</h2>
+      <h2>EJ2 React Grid — hidden column leaks into a visible column's cell</h2>
       <div className="notice">
-        <b>Repro:</b> <code>enableVirtualization</code> + fixed{' '}
-        <code>rowHeight=36</code> + <code>allowTextWrap</code> (
-        <code>wrapMode: "Content"</code>) + template columns with variable-length
-        content and <b>no explicit width</b> (Contralor / Empresas contratantes
-        habilitadas), plus <code>autoFitColumns()</code> called from{' '}
-        <code>dataBound</code>. Scroll the grid up/down a few times, then
-        resize or sort a column — rows and header cells drift out of
-        alignment with their column, and some rows overlap/clip their
-        neighbor once a wrapped multi-line cell is virtualized back into
-        view. Expected: rows always stay aligned to their column and to
-        adjacent rows regardless of wrapped content or scroll position.
+        <b>Repro:</b> two <code>visible: false</code> columns (
+        <code>createdUser</code>, <code>createdDate</code>) sit between
+        visible ones — same layout as our production "Companies" grid:
+        ModifiedUser → <i>CreatedUser (hidden)</i> → ModifiedDate →{' '}
+        <i>CreatedDate (hidden)</i> → FieldAudit → AuditComplianceRH — under{' '}
+        <code>enableVirtualization</code> + <code>autoFitColumns()</code>{' '}
+        called on every <code>dataBound</code>. Scroll up/down repeatedly,
+        sort, and use the search box a lot to force many virtualized
+        row-batch swaps. Watch the "Auditoría de campo" / "Auditoría
+        fiscalización de RH" columns: expected is always a frequency value
+        (Mensual/Trimestral/Semestral/Anual) under each header. The bug is a
+        date value (from the hidden CreatedDate column) appearing under
+        "Auditoría de campo" instead, with every value after it shifted one
+        column to the right relative to the header row.
       </div>
 
       <GridComponent
@@ -243,6 +268,34 @@ export default function App() {
             width="150"
             allowSorting={false}
             allowGrouping={false}
+          />
+          <ColumnDirective field="modifiedUser" headerText="Modificado por" width="150" />
+          <ColumnDirective
+            field="createdUser"
+            headerText="Creado por"
+            width="150"
+            visible={false}
+          />
+          <ColumnDirective
+            field="modifiedDate"
+            headerText="Fecha modificado"
+            type="dateTime"
+            format="dd/MM/yyyy"
+            width="150"
+          />
+          <ColumnDirective
+            field="createdDate"
+            headerText="Fecha creado"
+            type="dateTime"
+            format="dd/MM/yyyy"
+            width="150"
+            visible={false}
+          />
+          <ColumnDirective field="fieldAudit" headerText="Auditoría de campo" width="150" />
+          <ColumnDirective
+            field="auditComplianceRH"
+            headerText="Auditoría fiscalización de RH"
+            width="150"
           />
         </ColumnsDirective>
         <Inject
