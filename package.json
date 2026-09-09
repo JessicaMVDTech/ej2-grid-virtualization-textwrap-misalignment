@@ -1,0 +1,29 @@
+{
+  "name": "ej2-grid-virtualization-textwrap-misalignment",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@syncfusion/ej2-base": "31.2.18",
+    "@syncfusion/ej2-buttons": "31.2.3",
+    "@syncfusion/ej2-calendars": "31.2.5",
+    "@syncfusion/ej2-data": "31.2.5",
+    "@syncfusion/ej2-dropdowns": "31.2.5",
+    "@syncfusion/ej2-grids": "31.2.5",
+    "@syncfusion/ej2-inputs": "31.2.15",
+    "@syncfusion/ej2-navigations": "31.2.16",
+    "@syncfusion/ej2-popups": "31.2.12",
+    "@syncfusion/ej2-react-grids": "31.2.5",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.5"
+  }
+}
