@@ -23,3 +23,26 @@ body {
   padding: 1px 4px;
   border-radius: 3px;
 }
+
+.edit-template {
+  padding: 8px 20px 20px;
+  width: 360px;
+}
+
+.edit-title {
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.edit-row {
+  margin-bottom: 22px;
+}
+
+.edit-row.two-col {
+  display: flex;
+  gap: 16px;
+}
+
+.edit-row.two-col > * {
+  flex: 1;
+}

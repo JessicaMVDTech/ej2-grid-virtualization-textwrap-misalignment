@@ -18,7 +18,10 @@
     "@syncfusion/ej2-inputs": "31.2.15",
     "@syncfusion/ej2-navigations": "31.2.16",
     "@syncfusion/ej2-popups": "31.2.12",
+    "@syncfusion/ej2-react-buttons": "31.2.3",
+    "@syncfusion/ej2-react-dropdowns": "31.2.5",
     "@syncfusion/ej2-react-grids": "31.2.5",
+    "@syncfusion/ej2-react-inputs": "31.2.5",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },

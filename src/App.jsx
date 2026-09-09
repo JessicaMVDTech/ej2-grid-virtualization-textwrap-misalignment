@@ -9,7 +9,12 @@ import {
   Reorder,
   Sort,
   Filter,
+  Edit,
+  Toolbar,
 } from '@syncfusion/ej2-react-grids';
+import { TextBoxComponent } from '@syncfusion/ej2-react-inputs';
+import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
+import { CheckBoxComponent } from '@syncfusion/ej2-react-buttons';
 
 import '@syncfusion/ej2-base/styles/bootstrap5.css';
 import '@syncfusion/ej2-buttons/styles/bootstrap5.css';
@@ -77,9 +82,86 @@ function buildData(count = 1200) {
   });
 }
 
+// Simplified stand-in for the app's real dialog-mode edit template
+// (a custom form component passed to `editSettings.template`, instead
+// of the grid's auto-generated edit fields). The real one is a
+// multi-tab form wired to app-specific contexts/permissions; this
+// keeps just the shape that matters for the grid config: Dialog mode
+// + a custom template component.
+function CompanyEditTemplate(props) {
+  return (
+    <div className="edit-template">
+      <div className="edit-title">
+        {props.id ? `Editar contratista #${props.id}` : 'Nuevo contratista'}
+      </div>
+      <div className="edit-row">
+        <TextBoxComponent
+          id="legalName"
+          name="legalName"
+          value={props.legalName}
+          placeholder="Razon social"
+          floatLabelType="Auto"
+        />
+      </div>
+      <div className="edit-row">
+        <DropDownListComponent
+          id="subContractorCompany"
+          name="subContractorCompany"
+          dataSource={SUBCONTRATO_OPTIONS}
+          value={props.subContractorCompany}
+          placeholder="Subcontrato"
+          floatLabelType="Auto"
+        />
+      </div>
+      <div className="edit-row two-col">
+        <TextBoxComponent
+          id="vendorId"
+          name="vendorId"
+          value={props.vendorId}
+          placeholder="Número SAP"
+          floatLabelType="Auto"
+        />
+        <TextBoxComponent
+          id="taxCode"
+          name="taxCode"
+          value={props.taxCode}
+          placeholder="RUT"
+          floatLabelType="Auto"
+        />
+      </div>
+      <div className="edit-row">
+        <CheckBoxComponent
+          id="documentsOk"
+          name="documentsOk"
+          label="Acceso permitido"
+          checked={props.documentsOk}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const gridRef = useRef(null);
   const data = useMemo(() => buildData(), []);
+
+  // Same filterSettings the production grid passes to GridComponent.
+  const filterSettings = {
+    enableInfiniteScrolling: true,
+    type: 'Excel',
+    ignoreAccent: true,
+    columns: [],
+  };
+
+  const editSettings = {
+    mode: 'Dialog',
+    allowAdding: true,
+    allowDeleting: true,
+    allowEditing: true,
+    allowEditOnDblClick: true,
+    showDeleteConfirmDialog: true,
+    template: (props) => <CompanyEditTemplate {...props} />,
+  };
 
   const onDataBound = () => {
     // Same call the production `dataBound` handler makes after every
@@ -118,6 +200,9 @@ export default function App() {
         textWrapSettings={{ wrapMode: 'Content' }}
         enableVirtualization={true}
         enableStickyHeader={true}
+        filterSettings={filterSettings}
+        editSettings={editSettings}
+        toolbar={['Edit', 'Delete', 'Search']}
         rowHeight={36}
         dataBound={onDataBound}
       >
@@ -128,6 +213,7 @@ export default function App() {
             field="controllers"
             headerText="Contralor"
             template={multiValueTemplate('controllers')}
+            filter={{ type: 'CheckBox' }}
             allowSorting={false}
             allowGrouping={false}
           />
@@ -136,6 +222,7 @@ export default function App() {
             field="contractingCompanies"
             headerText="Empresas contratantes habilitadas"
             template={multiValueTemplate('contractingCompanies')}
+            filter={{ type: 'CheckBox' }}
             allowSorting={false}
             allowGrouping={false}
           />
@@ -152,12 +239,15 @@ export default function App() {
             field="mainCompanies"
             headerText="Código"
             template={multiValueTemplate('mainCompanies')}
+            filter={{ type: 'CheckBox' }}
             width="150"
             allowSorting={false}
             allowGrouping={false}
           />
         </ColumnsDirective>
-        <Inject services={[VirtualScroll, Resize, Reorder, Sort, Filter]} />
+        <Inject
+          services={[VirtualScroll, Resize, Reorder, Sort, Filter, Edit, Toolbar]}
+        />
       </GridComponent>
     </div>
   );
